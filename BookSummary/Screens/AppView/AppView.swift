@@ -53,6 +53,11 @@ struct AppView: View {
                 }
             }
         }
+        .background(Color(
+            red: 255 / 255,
+            green: 248 / 255,
+            blue: 243 / 255)
+        )
         .onAppear {
             viewStore.send(.onAppear)
         }

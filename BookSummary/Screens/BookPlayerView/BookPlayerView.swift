@@ -128,11 +128,6 @@ struct BookPlayerView: View {
                 Spacer(minLength: 70)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(
-                red: 255 / 255,
-                green: 248 / 255,
-                blue: 243 / 255)
-            )
         }
     }
 }
