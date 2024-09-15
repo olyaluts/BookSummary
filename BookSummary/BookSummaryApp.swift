@@ -6,12 +6,17 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
-struct BookSummaryApp: App {
+struct SummaryPlayerTCAApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppView(
+                store: Store(initialState: AppFeature.State(book: Book.mockData)) {
+                    AppFeature()
+                }
+            )
         }
     }
 }
