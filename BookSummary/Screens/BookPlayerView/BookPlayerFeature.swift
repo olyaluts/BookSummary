@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import Combine
 
 let dateComponentsFormatter: DateComponentsFormatter = {
     let formatter = DateComponentsFormatter()
@@ -45,21 +46,21 @@ struct BookPlayerFeature: Reducer {
             }
         }
 
-        var bookSummary: Book
+        let book: Book
         var currentChapterIndex: Int = 0
         var currentChapter: BookChapter? {
-            guard currentChapterIndex < bookSummary.chapters.count
+            guard currentChapterIndex < book.chapters.count
             else { return nil }
-            return bookSummary.chapters[currentChapterIndex]
+            return book.chapters[currentChapterIndex]
         }
 
         var isPlaying: Bool = false
         var playbackPosition: PlaybackPosition
         var playbackSpeed: PlaybackSpeed = .x1
 
-        init(bookSummary: Book) {
-            self.bookSummary = bookSummary
-            if let firstChapter = bookSummary.chapters.first {
+        init(book: Book) {
+            self.book = book
+            if let firstChapter = book.chapters.first {
                 playbackPosition = .init(currentTime: 0, duration: firstChapter.duration)
             } else {
                 playbackPosition = .init(currentTime: 0, duration: 0)
@@ -192,7 +193,7 @@ struct BookPlayerFeature: Reducer {
                 }
             case .updateChapterIfNeeded:
                 if state.playbackPosition.progress == 1 {
-                    state.currentChapterIndex = (state.currentChapterIndex + 1) % state.bookSummary.chapters.count
+                    state.currentChapterIndex = (state.currentChapterIndex + 1) % state.book.chapters.count
                     if state.currentChapterIndex == 0 {
                         // stoping playback so summary is fully listened to
                         state.isPlaying = false

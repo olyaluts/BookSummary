@@ -8,6 +8,7 @@
 import Foundation
 import ComposableArchitecture
 
+
 struct AppFeature: Reducer {
     struct State {
         var book: Book
@@ -34,7 +35,7 @@ struct AppFeature: Reducer {
 
             case .finishLoading:
                 state.isLoading = false
-                state.player = BookPlayerFeature.State(bookSummary: state.book)
+                state.player = BookPlayerFeature.State(book: state.book)
                 return .none
 
             case .onAppear, .retryButtonTapped:

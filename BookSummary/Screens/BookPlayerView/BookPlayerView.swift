@@ -19,13 +19,13 @@ struct BookPlayerView: View {
             let timeLeft = viewStore.state.playbackPosition.duration - currentTime
             
             VStack(alignment: .center) {
-                Image(viewStore.bookSummary.imageName)
+                Image(viewStore.book.imageName)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .padding(.vertical, 24)
                     .padding(.horizontal, 65)
                 
-                Text("KEY POINT \(viewStore.currentChapterIndex + 1) OF \(viewStore.bookSummary.chapters.count)")
+                Text("KEY POINT \(viewStore.currentChapterIndex + 1) OF \(viewStore.book.chapters.count)")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding(6)
@@ -122,7 +122,7 @@ struct BookPlayerView: View {
                             .font(.system(size: 24))
                     }
                     .tint(.primary)
-                    .disabled(viewStore.currentChapterIndex == (viewStore.bookSummary.chapters.count - 1))
+                    .disabled(viewStore.currentChapterIndex == (viewStore.book.chapters.count - 1))
                 }
                 
                 Spacer(minLength: 70)
@@ -144,7 +144,7 @@ struct BookPlayerView: View {
         NavigationStack {
             BookPlayerView(
                 store: Store(initialState: BookPlayerFeature.State(
-                    bookSummary: Book.mockData)) {
+                    book: Book.mockData)) {
                         BookPlayerFeature()
                     }
             )
