@@ -7,7 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
-
+import CasePaths
 
 struct AppFeature: Reducer {
     struct State {
@@ -16,28 +16,29 @@ struct AppFeature: Reducer {
         var isLoading: Bool = false
         var player: BookPlayerFeature.State?
     }
-
+   
+    @CasePathable
     enum Action {
         case player(BookPlayerFeature.Action)
-
+        
         case onAppear
         case onDisappear
         case retryButtonTapped
-
+        
         case finishLoading
         case loadError(Error)
     }
-
+    
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .player: return .none
-
+                
             case .finishLoading:
                 state.isLoading = false
                 state.player = BookPlayerFeature.State(book: state.book)
                 return .none
-
+                
             case .onAppear, .retryButtonTapped:
                 state.errorMessage = nil
                 state.isLoading = true
@@ -50,17 +51,17 @@ struct AppFeature: Reducer {
                         await send(.loadError(error))
                     }
                 }
-
+                
             case .onDisappear:
                 return .none
-
+                
             case .loadError:
                 state.isLoading = false
                 state.errorMessage = "Error loading data. Please retry."
                 return .none
             }
         }
-        .ifLet(\.player, action: /Action.player) {
+        .ifLet(\.player, action: \Action.Cases.player) {
             BookPlayerFeature()
         }
     }
