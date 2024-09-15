@@ -76,7 +76,7 @@ struct BookPlayerView: View {
                 .buttonStyle(.bordered)
                 
                 Spacer(minLength: 32)
-            
+                
                 HStack(spacing: 24) {
                     Button {
                         viewStore.send(.previousChapterButtonTapped)

@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-
+import CasePaths
 
 struct AppView: View {
     let store: StoreOf<AppFeature>
@@ -45,8 +45,9 @@ struct AppView: View {
                 } else {
                     IfLetStore(
                         store.scope(
-                            state: \.player, 
-                            action: AppFeature.Action.player),
+                            state: \.player,
+                            action: \AppFeature.Action.Cases.player
+                        ),
                         then: BookPlayerView.init(store:)
                     )
                 }

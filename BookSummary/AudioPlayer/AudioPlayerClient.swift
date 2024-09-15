@@ -20,17 +20,17 @@ extension AudioPlayerClient: DependencyKey {
     class Context {
         var audioPlayer: AudioPlayer?
         var continuation: AsyncStream<PlaybackState>.Continuation?
-
+        
         init() {}
     }
-
+    
     static let liveValue: AudioPlayerClient = {
         let context = Context()
-
+        
         return AudioPlayerClient(
             play: { playbackPosition, url, speed in
                 @Dependency(\.audioSession) var audioSession: AudioSession
-
+                
                 let stream = AsyncStream<PlaybackState> { continuation in
                     do {
                         context.continuation = continuation
@@ -47,7 +47,7 @@ extension AudioPlayerClient: DependencyKey {
                                 continuation.finish()
                             }
                         )
-
+                        
                         try audioSession.enablePlayback(true)
                         context.audioPlayer?.player.enableRate = true
                         context.audioPlayer?.player.prepareToPlay()
@@ -58,7 +58,7 @@ extension AudioPlayerClient: DependencyKey {
                             let clock = ContinuousClock()
                             for await _ in clock.timer(interval: .milliseconds(100)) {
                                 guard context.audioPlayer?.player.isPlaying == true else { continue }
-
+                                
                                 let position = PlaybackPosition(
                                     currentTime: context.audioPlayer?.player.currentTime ?? 0,
                                     duration: context.audioPlayer?.player.duration ?? 0
@@ -136,7 +136,7 @@ extension DependencyValues {
 struct PlaybackPosition: Equatable {
     var currentTime: TimeInterval
     var duration: TimeInterval
-
+    
     var progress: Double { currentTime / duration }
 }
 

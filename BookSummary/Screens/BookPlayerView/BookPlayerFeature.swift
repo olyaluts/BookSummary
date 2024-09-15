@@ -24,7 +24,7 @@ struct BookPlayerFeature: Reducer {
             case x1
             case x15
             case x2
-
+            
             var title: String {
                 switch self {
                 case .x05: return "x0.5"
@@ -34,18 +34,18 @@ struct BookPlayerFeature: Reducer {
                 case .x2: return "x2"
                 }
             }
-
+            
             var speedMultiplier: Float {
                 switch self {
                 case .x05: return 0.5
                 case .x075: return 0.75
                 case .x1: return 1
                 case .x15: return 1.5
-                case .x2: return 2.0 
+                case .x2: return 2.0
                 }
             }
         }
-
+        
         let book: Book
         var currentChapterIndex: Int = 0
         var currentChapter: BookChapter? {
@@ -53,11 +53,11 @@ struct BookPlayerFeature: Reducer {
             else { return nil }
             return book.chapters[currentChapterIndex]
         }
-
+        
         var isPlaying: Bool = false
         var playbackPosition: PlaybackPosition
         var playbackSpeed: PlaybackSpeed = .x1
-
+        
         init(book: Book) {
             self.book = book
             if let firstChapter = book.chapters.first {
@@ -67,7 +67,7 @@ struct BookPlayerFeature: Reducer {
             }
         }
     }
-
+    
     enum Action: Equatable {
         case audioPlayerClient(PlaybackState)
         case playButtonTapped
@@ -80,11 +80,11 @@ struct BookPlayerFeature: Reducer {
         case speedButtonTapped
         case updateChapterIfNeeded
     }
-
+    
     @Dependency(\.audioPlayer) var audioPlayer
     @Dependency(\.continuousClock) var clock
     private enum CancelID { case play, seek }
-
+    
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -108,10 +108,10 @@ struct BookPlayerFeature: Reducer {
                     )
                     return .send(.updateChapterIfNeeded, animation: .default)
                 }
-
+                
             case .playButtonTapped:
                 state.isPlaying = true
-
+                
                 return .run { [fileName = state.currentChapter?.audioFileName, playbackPosition = state.playbackPosition, speed = state.playbackSpeed] send in
                     // Safely unwrap fileName
                     guard let fileName = fileName else {
@@ -119,14 +119,14 @@ struct BookPlayerFeature: Reducer {
                         print("Error: fileName is nil")
                         return
                     }
-
+                    
                     // Safely get the URL from the bundle
                     guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
                         // Handle case where URL creation fails
                         print("Error: Unable to find file with name \(fileName).mp3 in the bundle")
                         return
                     }
-
+                    
                     do {
                         // Attempt to play the audio and handle any errors within the async sequence
                         for await playback in try await self.audioPlayer.play(playbackPosition, url, speed.speedMultiplier) {
@@ -139,14 +139,14 @@ struct BookPlayerFeature: Reducer {
                     }
                 }
                 .cancellable(id: CancelID.play, cancelInFlight: true)
-
+                
             case .pauseButtonTapped:
                 state.isPlaying = false
                 return .run { _ in
                     await audioPlayer.pause()
                 }
                 .merge(with: .cancel(id: CancelID.play))
-
+                
             case .fastForwardButtonTapped:
                 var playbackPosition = state.playbackPosition
                 playbackPosition.currentTime += 10
@@ -185,9 +185,9 @@ struct BookPlayerFeature: Reducer {
                 return .none
             case .speedButtonTapped:
                 state.playbackSpeed = state.playbackSpeed == State.PlaybackSpeed.allCases.last
-                    ? State.PlaybackSpeed.allCases.first!
-                    : State.PlaybackSpeed.allCases.first { $0.speedMultiplier > state.playbackSpeed.speedMultiplier }!
-
+                ? State.PlaybackSpeed.allCases.first!
+                : State.PlaybackSpeed.allCases.first { $0.speedMultiplier > state.playbackSpeed.speedMultiplier }!
+                
                 return .run { [speed = state.playbackSpeed.speedMultiplier] send in
                     await audioPlayer.speed(speed)
                 }
@@ -195,7 +195,6 @@ struct BookPlayerFeature: Reducer {
                 if state.playbackPosition.progress == 1 {
                     state.currentChapterIndex = (state.currentChapterIndex + 1) % state.book.chapters.count
                     if state.currentChapterIndex == 0 {
-                        // stoping playback so summary is fully listened to
                         state.isPlaying = false
                     }
                     state.playbackPosition = .init(currentTime: 0, duration: state.currentChapter?.duration ?? 0)
@@ -203,7 +202,7 @@ struct BookPlayerFeature: Reducer {
                         return .send(.playButtonTapped)
                     }
                 }
-
+                
                 return .none
             }
         }

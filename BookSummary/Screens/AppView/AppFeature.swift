@@ -16,7 +16,7 @@ struct AppFeature: Reducer {
         var isLoading: Bool = false
         var player: BookPlayerFeature.State?
     }
-   
+    
     @CasePathable
     enum Action {
         case player(BookPlayerFeature.Action)

@@ -12,7 +12,7 @@ final class AudioPlayer: NSObject, AVAudioPlayerDelegate, Sendable {
     let didFinishPlaying: @Sendable (Bool) -> Void
     let decodeErrorDidOccur: @Sendable (Error?) -> Void
     let player: AVAudioPlayer
-
+    
     init(
         url: URL,
         didFinishPlaying: @escaping @Sendable (Bool) -> Void,
@@ -24,11 +24,11 @@ final class AudioPlayer: NSObject, AVAudioPlayerDelegate, Sendable {
         super.init()
         player.delegate = self
     }
-
+    
     func audioPlayerDidFinishPlaying(_: AVAudioPlayer, successfully flag: Bool) {
         didFinishPlaying(flag)
     }
-
+    
     func audioPlayerDecodeErrorDidOccur(_: AVAudioPlayer, error: Error?) {
         decodeErrorDidOccur(error)
     }
