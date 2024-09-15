@@ -24,7 +24,6 @@ struct BookPlayerView: View {
                     .aspectRatio(contentMode: .fit)
                     .padding(.vertical, 24)
                     .padding(.horizontal, 65)
-                    .cornerRadius(5.0)
                 
                 Text("KEY POINT \(viewStore.currentChapterIndex + 1) OF \(viewStore.bookSummary.chapters.count)")
                     .font(.subheadline)
