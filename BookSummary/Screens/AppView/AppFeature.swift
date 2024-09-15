@@ -10,7 +10,7 @@ import ComposableArchitecture
 import CasePaths
 
 struct AppFeature: Reducer {
-    struct State {
+    struct State: Equatable {
         var book: Book
         var errorMessage: String?
         var isLoading: Bool = false
@@ -18,7 +18,7 @@ struct AppFeature: Reducer {
     }
     
     @CasePathable
-    enum Action {
+    enum Action: Equatable {
         case player(BookPlayerFeature.Action)
         
         case onAppear
@@ -27,6 +27,25 @@ struct AppFeature: Reducer {
         
         case finishLoading
         case loadError(Error)
+        
+        static func == (lhs: AppFeature.Action, rhs: AppFeature.Action) -> Bool {
+               switch (lhs, rhs) {
+               case (.onAppear, .onAppear),
+                    (.onDisappear, .onDisappear),
+                    (.retryButtonTapped, .retryButtonTapped),
+                    (.finishLoading, .finishLoading):
+                   return true
+
+               case let (.loadError(lhsError), .loadError(rhsError)):
+                   return lhsError.localizedDescription == rhsError.localizedDescription
+
+               case let (.player(lhsPlayerAction), .player(rhsPlayerAction)):
+                   return lhsPlayerAction == rhsPlayerAction
+                   
+               default:
+                   return false
+               }
+           }
     }
     
     var body: some ReducerOf<Self> {
