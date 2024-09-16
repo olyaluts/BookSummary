@@ -18,11 +18,13 @@ struct AppView: View {
         let isLoading: Bool
         let errorMessage: String?
         let showPlayer: Bool
+        let currentChapterText: String?
         
         init(state: AppFeature.State) {
             self.isLoading = state.isLoading
             self.errorMessage = state.errorMessage
             self.showPlayer = state.showPlayer
+            self.currentChapterText = state.player?.currentChapter?.title
         }
     }
     
@@ -54,12 +56,14 @@ struct AppView: View {
                             then: BookPlayerView.init(store:)
                         )
                     } else {
-                        Text("Current Chapter: Chapter 1")
-                            .padding()
+                        if let currentChapterText = viewStore.currentChapterText
+                        {
+                            Text(currentChapterText)
+                                .padding()
+                        }
                     }
                     
                     Spacer()
-              
                     CustomToggle(isOn: viewStore.binding(
                         get: \.showPlayer,
                         send: AppFeature.Action.toggleChanged

@@ -40,7 +40,7 @@ struct BookPlayerView: View {
                     .padding(.vertical, 16)
                 Spacer(minLength: 24)
                 HStack(spacing: 12) {
-                    dateComponentsFormatter.string(from: currentTime)
+                    DateFormatter.dateComponentsFormatter.string(from: currentTime)
                         .map {
                             Text($0)
                                 .font(.footnote.monospacedDigit())
@@ -54,7 +54,7 @@ struct BookPlayerView: View {
                     )
                     .disabled(duration == 0)
                     
-                    dateComponentsFormatter
+                    DateFormatter.dateComponentsFormatter
                         .string(from: timeLeft)
                         .map {
                             Text($0)

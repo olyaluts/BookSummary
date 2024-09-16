@@ -9,13 +9,6 @@ import Foundation
 import ComposableArchitecture
 import Combine
 
-let dateComponentsFormatter: DateComponentsFormatter = {
-    let formatter = DateComponentsFormatter()
-    formatter.allowedUnits = [.minute, .second]
-    formatter.zeroFormattingBehavior = .pad
-    return formatter
-}()
-
 struct BookPlayerFeature: Reducer {
     struct State: Equatable {
         enum PlaybackSpeed: CaseIterable, Equatable {
@@ -47,7 +40,7 @@ struct BookPlayerFeature: Reducer {
         }
         
         let book: Book
-        var currentChapterIndex: Int = 0
+        var currentChapterIndex = 0
         var currentChapter: BookChapter? {
             guard currentChapterIndex < book.chapters.count
             else { return nil }
@@ -79,6 +72,7 @@ struct BookPlayerFeature: Reducer {
         case previousChapterButtonTapped
         case speedButtonTapped
         case updateChapterIfNeeded
+        case currentChapterIndexChanged(Int)
     }
     
     @Dependency(\.audioPlayer) var audioPlayer
@@ -206,6 +200,8 @@ struct BookPlayerFeature: Reducer {
                 }
                 
                 return .none
+            case .currentChapterIndexChanged(_):
+                return .send(.currentChapterIndexChanged(state.currentChapterIndex))
             }
         }
     }
