@@ -185,12 +185,14 @@ struct BookPlayerFeature: Reducer {
                 return .none
             case .speedButtonTapped:
                 state.playbackSpeed = state.playbackSpeed == State.PlaybackSpeed.allCases.last
-                ? State.PlaybackSpeed.allCases.first!
-                : State.PlaybackSpeed.allCases.first { $0.speedMultiplier > state.playbackSpeed.speedMultiplier }!
-                
+                    ? State.PlaybackSpeed.allCases.first ?? state.playbackSpeed
+                    : State.PlaybackSpeed.allCases.first { $0.speedMultiplier > state.playbackSpeed.speedMultiplier }
+                    ?? state.playbackSpeed
+
                 return .run { [speed = state.playbackSpeed.speedMultiplier] send in
                     await audioPlayer.speed(speed)
                 }
+
             case .updateChapterIfNeeded:
                 if state.playbackPosition.progress == 1 {
                     state.currentChapterIndex = (state.currentChapterIndex + 1) % state.book.chapters.count
