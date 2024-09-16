@@ -17,10 +17,12 @@ struct AppView: View {
     struct ViewState: Equatable {
         let isLoading: Bool
         let errorMessage: String?
+        let showPlayer: Bool
         
         init(state: AppFeature.State) {
             self.isLoading = state.isLoading
             self.errorMessage = state.errorMessage
+            self.showPlayer = state.showPlayer
         }
     }
     
@@ -33,7 +35,7 @@ struct AppView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .bottom) {
+        VStack {
             if let errorMessage = viewStore.errorMessage {
                 VStack {
                     Text(errorMessage)
@@ -43,13 +45,26 @@ struct AppView: View {
                 if viewStore.isLoading {
                     ProgressView()
                 } else {
-                    IfLetStore(
-                        store.scope(
-                            state: \.player,
-                            action: \AppFeature.Action.Cases.player
-                        ),
-                        then: BookPlayerView.init(store:)
-                    )
+                    if viewStore.showPlayer {
+                        IfLetStore(
+                            store.scope(
+                                state: \.player,
+                                action: \AppFeature.Action.Cases.player
+                            ),
+                            then: BookPlayerView.init(store:)
+                        )
+                    } else {
+                        Text("Current Chapter: Chapter 1")
+                            .padding()
+                    }
+                    
+                    Spacer()
+              
+                    CustomToggle(isOn: viewStore.binding(
+                        get: \.showPlayer,
+                        send: AppFeature.Action.toggleChanged
+                    ))
+                    .padding(.bottom, 20)
                 }
             }
         }

@@ -13,8 +13,9 @@ struct AppFeature: Reducer {
     struct State: Equatable {
         var book: Book
         var errorMessage: String?
-        var isLoading: Bool = false
+        var isLoading = false
         var player: BookPlayerFeature.State?
+        var showPlayer = true
     }
     
     @CasePathable
@@ -27,6 +28,8 @@ struct AppFeature: Reducer {
         
         case finishLoading
         case loadError(Error)
+        
+        case toggleChanged(Bool)
         
         static func == (lhs: AppFeature.Action, rhs: AppFeature.Action) -> Bool {
                switch (lhs, rhs) {
@@ -77,6 +80,10 @@ struct AppFeature: Reducer {
             case .loadError:
                 state.isLoading = false
                 state.errorMessage = "Error loading data. Please retry."
+                return .none
+                
+            case .toggleChanged(let showPlayer):
+                state.showPlayer = showPlayer
                 return .none
             }
         }
