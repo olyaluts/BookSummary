@@ -21,10 +21,10 @@ struct AppFeature: Reducer {
     @CasePathable
     enum Action: Equatable {
         case player(BookPlayerFeature.Action)
-        case currentChapterIndexChanged(Int)
         
         case onAppear
         case onDisappear
+        
         case retryButtonTapped
         
         case finishLoading
@@ -85,8 +85,6 @@ struct AppFeature: Reducer {
                 
             case .toggleChanged(let showPlayer):
                 state.showPlayer = showPlayer
-                return .none
-            case .currentChapterIndexChanged:
                 return .none
             }
         }

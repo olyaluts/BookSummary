@@ -72,7 +72,6 @@ struct BookPlayerFeature: Reducer {
         case previousChapterButtonTapped
         case speedButtonTapped
         case updateChapterIfNeeded
-        case currentChapterIndexChanged(Int)
     }
     
     @Dependency(\.audioPlayer) var audioPlayer
@@ -93,7 +92,7 @@ struct BookPlayerFeature: Reducer {
                 case .stop:
                     return .none
                 case let .error(message):
-                    print("Playback error: \(message ?? "nil")")
+                    print("Playback error: \(message.orEmpty())")
                     return .none
                 case .finish:
                     state.playbackPosition = .init(
@@ -106,28 +105,24 @@ struct BookPlayerFeature: Reducer {
             case .playButtonTapped:
                 state.isPlaying = true
                 
-                return .run { [fileName = state.currentChapter?.audioFileName, playbackPosition = state.playbackPosition, speed = state.playbackSpeed] send in
-                    // Safely unwrap fileName
+                return .run { [fileName = state.currentChapter?.audioFileName,
+                               playbackPosition = state.playbackPosition,
+                               speed = state.playbackSpeed] send in
                     guard let fileName = fileName else {
-                        // Handle case where fileName is nil
                         print("Error: fileName is nil")
                         return
                     }
                     
-                    // Safely get the URL from the bundle
                     guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
-                        // Handle case where URL creation fails
                         print("Error: Unable to find file with name \(fileName).mp3 in the bundle")
                         return
                     }
                     
                     do {
-                        // Attempt to play the audio and handle any errors within the async sequence
                         for await playback in try await self.audioPlayer.play(playbackPosition, url, speed.speedMultiplier) {
                             await send(.audioPlayerClient(playback))
                         }
                     } catch {
-                        // Handle any errors from the audio player
                         print("Error: Audio playback failed with error \(error.localizedDescription)")
                         await send(.audioPlayerClient(.error(error.localizedDescription)))
                     }
@@ -200,8 +195,6 @@ struct BookPlayerFeature: Reducer {
                 }
                 
                 return .none
-            case .currentChapterIndexChanged(_):
-                return .send(.currentChapterIndexChanged(state.currentChapterIndex))
             }
         }
     }
