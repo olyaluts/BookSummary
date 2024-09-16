@@ -72,10 +72,7 @@ struct AppView: View {
                 }
             }
         }
-        .background(Color(
-            red: 255 / 255,
-            green: 248 / 255,
-            blue: 243 / 255)
+        .background(viewStore.showPlayer ? Color(red: 255 / 255, green: 248 / 255, blue: 243 / 255) : .white
         )
         .onAppear {
             viewStore.send(.onAppear)
