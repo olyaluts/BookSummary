@@ -28,28 +28,9 @@ struct AppFeature {
         case retryButtonTapped
         
         case finishLoading
-        case loadError(Error)
+        case loadError(String)
         
         case toggleChanged(Bool)
-        
-        static func == (lhs: AppFeature.Action, rhs: AppFeature.Action) -> Bool {
-               switch (lhs, rhs) {
-               case (.onAppear, .onAppear),
-                    (.onDisappear, .onDisappear),
-                    (.retryButtonTapped, .retryButtonTapped),
-                    (.finishLoading, .finishLoading):
-                   return true
-
-               case let (.loadError(lhsError), .loadError(rhsError)):
-                   return lhsError.localizedDescription == rhsError.localizedDescription
-
-               case let (.player(lhsPlayerAction), .player(rhsPlayerAction)):
-                   return lhsPlayerAction == rhsPlayerAction
-                   
-               default:
-                   return false
-               }
-           }
     }
     
     var body: some ReducerOf<Self> {
@@ -71,7 +52,7 @@ struct AppFeature {
                         try await Task.sleep(nanoseconds: 1_000_000_000)  // Simulate loading delay
                         await send(.finishLoading)
                     } catch {
-                        await send(.loadError(error))
+                        await send(.loadError("Error message")) // we could add custom error logic later or add custom error type
                     }
                 }
                 
