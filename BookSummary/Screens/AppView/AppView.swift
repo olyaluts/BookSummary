@@ -8,77 +8,62 @@
 import Foundation
 import ComposableArchitecture
 import SwiftUI
-import CasePaths
 
 struct AppView: View {
     let store: StoreOf<AppFeature>
-    @ObservedObject var viewStore: ViewStore<ViewState, AppFeature.Action>
-    
-    struct ViewState: Equatable {
-        let isLoading: Bool
-        let errorMessage: String?
-        let showPlayer: Bool
-        let currentChapterText: String?
-        
-        init(state: AppFeature.State) {
-            self.isLoading = state.isLoading
-            self.errorMessage = state.errorMessage
-            self.showPlayer = state.showPlayer
-            self.currentChapterText = state.player?.currentChapter?.title
-        }
-    }
     
     public init(store: StoreOf<AppFeature>) {
         self.store = store
-        self.viewStore = ViewStore(self.store, observe: ViewState.init)
         
         let thumbImage = UIImage(systemName: "circle.fill")
         UISlider.appearance().setThumbImage(thumbImage, for: .normal)
     }
     
     var body: some View {
-        VStack {
-            if let errorMessage = viewStore.errorMessage {
-                VStack {
-                    Text(errorMessage)
-                    Button("Retry", action: { viewStore.send(.retryButtonTapped) })
-                }
-            } else {
-                if viewStore.isLoading {
-                    ProgressView()
-                } else {
-                    if viewStore.showPlayer {
-                        IfLetStore(
-                            store.scope(
-                                state: \.player,
-                                action: \AppFeature.Action.Cases.player
-                            ),
-                            then: BookPlayerView.init(store:)
-                        )
-                    } else {
-                        if let currentChapterText = viewStore.currentChapterText
-                        {
-                            Text(currentChapterText)
-                                .padding()
-                        }
+        WithPerceptionTracking {
+            VStack {
+                if let errorMessage = store.errorMessage {
+                    VStack {
+                        Text(errorMessage)
+                        Button("Retry", action: { store.send(.retryButtonTapped) })
                     }
-                    
-                    Spacer()
-                    CustomToggle(isOn: viewStore.binding(
-                        get: \.showPlayer,
-                        send: AppFeature.Action.toggleChanged
-                    ))
-                    .padding(.bottom, 20)
+                } else {
+                    if store.isLoading {
+                        ProgressView()
+                    } else {
+                        if store.showPlayer {
+                            IfLetStore(
+                                store.scope(
+                                    state: \.player,
+                                    action: \AppFeature.Action.Cases.player
+                                ),
+                                then: BookPlayerView.init(store:)
+                            )
+                        } else {
+                            if let currentChapterText = store.player?.currentChapter?.title
+                            {
+                                Text(currentChapterText)
+                                    .padding()
+                            }
+                        }
+                        
+                        Spacer()
+                        CustomToggle(isOn: Binding(
+                            get: { store.showPlayer },
+                            set: { store.send(.toggleChanged($0)) }
+                        ))
+                        .padding(.bottom, 20)
+                    }
                 }
             }
-        }
-        .background(viewStore.showPlayer ? Color(red: 255 / 255, green: 248 / 255, blue: 243 / 255) : .white
-        )
-        .onAppear {
-            viewStore.send(.onAppear)
-        }
-        .onDisappear {
-            viewStore.send(.onDisappear)
+            .background(store.showPlayer ? Color(red: 255 / 255, green: 248 / 255, blue: 243 / 255) : .white
+            )
+            .onAppear {
+                store.send(.onAppear)
+            }
+            .onDisappear {
+                store.send(.onDisappear)
+            }
         }
     }
 }

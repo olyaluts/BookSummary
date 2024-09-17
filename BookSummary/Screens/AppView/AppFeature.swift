@@ -7,9 +7,10 @@
 
 import Foundation
 import ComposableArchitecture
-import CasePaths
 
-struct AppFeature: Reducer {
+@Reducer
+struct AppFeature {
+    @ObservableState
     struct State: Equatable {
         var book: Book
         var errorMessage: String?
@@ -18,7 +19,6 @@ struct AppFeature: Reducer {
         var showPlayer = true
     }
     
-    @CasePathable
     enum Action: Equatable {
         case player(BookPlayerFeature.Action)
         
@@ -88,7 +88,7 @@ struct AppFeature: Reducer {
                 return .none
             }
         }
-        .ifLet(\.player, action: \Action.Cases.player) {
+        .ifLet(\.player, action: \.player) {
             BookPlayerFeature()
         }
     }

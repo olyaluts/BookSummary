@@ -9,7 +9,9 @@ import Foundation
 import ComposableArchitecture
 import Combine
 
-struct BookPlayerFeature: Reducer {
+@Reducer
+struct BookPlayerFeature {
+    @ObservableState
     struct State: Equatable {
         enum PlaybackSpeed: CaseIterable, Equatable {
             case x05
